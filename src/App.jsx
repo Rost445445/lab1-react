@@ -1,61 +1,51 @@
+import { useState } from 'react';
 import Header from './components/Header';
-import { students } from './data';
+import Post from './components/molecules/Post/Post';
+import SearchBar from './components/molecules/SearchBar/SearchBar';
+import { posts } from './data';
 
 function App() {
-  // 1. Агрегація (reduce): Середній бал активних студентів
-  const activeStudents = students.filter(s => s.isActive);
-  const averageScore = activeStudents.length > 0 
-    ? (activeStudents.reduce((sum, s) => sum + s.score, 0) / activeStudents.length).toFixed(1)
-    : 0;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // 2. Фільтрація (filter): Відмінники (активні, бал > 80)
-  const topStudents = activeStudents.filter(s => s.score > 80);
+  const categories = ['All', ...new Set(posts.map(post => post.category))];
 
-  // 3. Сортування (sort): За спаданням балів
-  const sortedStudents = [...students].sort((a, b) => b.score - a.score);
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = post.author.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          post.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="app-container">
       <Header />
       <main className="feed">
-        <section>
-          <h2>Середній бал активних студентів: {averageScore}</h2>
-        </section>
+        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        
+        <div className="category-filters">
+          {categories.map(category => (
+            <button 
+              key={category}
+              className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
 
-        <section>
-          <h3>Повний список студентів:</h3>
-          <ul>
-            {students.map(student => (
-              <li 
-                key={student.id} 
-                style={!student.isActive ? { color: 'gray', textDecoration: 'line-through' } : {}}
-              >
-                {student.name} — {student.score} балів
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section>
-          <h3>Відмінники (Активні &gt; 80):</h3>
-          <ul>
-            {topStudents.map(student => (
-              <li key={student.id}>
-                {student.name} — {student.score} балів
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section>
-          <h3>Рейтинг (за спаданням балів):</h3>
-          <ol>
-            {sortedStudents.map(student => (
-              <li key={student.id}>
-                {student.name} — {student.score} балів
-              </li>
-            ))}
-          </ol>
+        <section className="posts-list">
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map(post => (
+              <Post key={post.id} {...post} />
+            ))
+          ) : (
+            <div className="empty-state">
+              <p>Нічого не знайдено за вашим запитом 😕</p>
+            </div>
+          )}
         </section>
       </main>
     </div>
@@ -63,5 +53,3 @@ function App() {
 }
 
 export default App;
-
-
