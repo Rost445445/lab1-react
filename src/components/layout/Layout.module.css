@@ -1,12 +1,44 @@
 .nav {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 15px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
   background: #fff;
   border-bottom: 2px solid #1877f2;
   margin-bottom: 20px;
 }
+
+.links {
+  display: flex;
+  gap: 20px;
+}
+
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.username {
+  font-size: 0.9rem;
+  color: #1c1e21;
+}
+
+.logoutBtn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #f0f2f5;
+  border-color: #ccc;
+}
+
 
 .nav a {
   text-decoration: none;
