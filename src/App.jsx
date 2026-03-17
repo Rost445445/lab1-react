@@ -2,10 +2,14 @@ import { useState } from 'react';
 import Header from './components/Header';
 import Post from './components/molecules/Post/Post';
 import SearchBar from './components/molecules/SearchBar/SearchBar';
-import { students, posts } from './data';
+import AddStudentForm from './components/molecules/AddStudentForm/AddStudentForm';
+import { students as initialStudents, posts } from './data';
 
 function App() {
-  // Stats/Dashboard state
+  // Students state
+  const [studentsList, setStudentsList] = useState(initialStudents);
+  
+  // Dashboard UI state
   const [showHelp, setShowHelp] = useState(false);
   const [showOnlySuccessful, setShowOnlySuccessful] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
@@ -13,6 +17,15 @@ function App() {
   // Search/Feed state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Logic for adding a student
+  const handleAddStudent = (newStudent) => {
+    const studentWithId = {
+      ...newStudent,
+      id: Date.now() // Unique ID
+    };
+    setStudentsList(prev => [...prev, studentWithId]);
+  };
 
   // Logic for posts
   const categories = ['All', ...new Set(posts.map(post => post.category))];
@@ -25,8 +38,8 @@ function App() {
 
   // Logic for students
   const filteredStudents = showOnlySuccessful 
-    ? students.filter(s => (s.score ?? 0) >= 60)
-    : students;
+    ? studentsList.filter(s => (s.score ?? 0) >= 60)
+    : studentsList;
 
   return (
     <div className="app-container">
@@ -65,6 +78,8 @@ function App() {
         <aside className="sidebar">
           <h2>Дашборд студентів</h2>
           
+          <AddStudentForm onAddStudent={handleAddStudent} />
+
           <div style={{ marginBottom: '20px' }}>
             <button onClick={() => setShowHelp(!showHelp)}>
               {showHelp ? 'Приховати інструкцію' : 'Показати інструкцію'}
@@ -117,8 +132,8 @@ function App() {
             {activeTab === 'stats' && (
               <section className="stats">
                 <h4>Статистика:</h4>
-                <p>Всього: {students.length}</p>
-                <p>Успішних: {students.filter(s => (s.score ?? 0) >= 60).length}</p>
+                <p>Всього: {studentsList.length}</p>
+                <p>Успішних: {studentsList.filter(s => (s.score ?? 0) >= 60).length}</p>
               </section>
             )}
 
@@ -134,4 +149,5 @@ function App() {
   );
 }
 
-export default App;
+export default App;
+
